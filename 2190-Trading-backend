@@ -1,0 +1,130 @@
+import React, { useState } from "react"; import { Card, CardContent } from "@/components/ui/card"; import { Button } from "@/components/ui/button"; import { Mail, Phone, ShoppingCart, Scissors, Car, UploadCloud } from "lucide-react"; import { motion } from "framer-motion";
+
+export default function HomePage() { const [booking, setBooking] = useState({ name: "", service: "", phone: "", date: "" }); const [message, setMessage] = useState(""); const [file, setFile] = useState(null);
+
+const handlePayment = () => { window.open("https://www.luno.com/en/pay", "_blank"); };
+
+const handleBookingSubmit = async () => { try { const res = await fetch("http://localhost:5000/book", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(booking), }); const data = await res.json(); setMessage(data.message || data.error); } catch (err) { setMessage("Error submitting booking"); } };
+
+const handleFileUpload = async () => { if (!file) return; const formData = new FormData(); formData.append("file", file);
+
+try {
+  const res = await fetch("http://localhost:5000/upload-proof", {
+    method: "POST",
+    body: formData,
+  });
+  const data = await res.json();
+  setMessage(data.message || data.error);
+} catch (err) {
+  setMessage("Error uploading proof of payment");
+}
+
+};
+
+return ( <main className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white p-4"> <header className="text-center py-8"> <motion.h1 className="text-4xl md:text-6xl font-bold" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1 }} > 2190 Trading Company </motion.h1> <p className="text-lg text-gray-400 mt-2">Empowering Youth. Creating Jobs.</p> </header>
+
+<section className="grid grid-cols-1 md:grid-cols-3 gap-6 py-10">
+    <Card className="bg-gray-800">
+      <CardContent className="p-6">
+        <Car className="text-yellow-400 w-10 h-10 mb-4" />
+        <h2 className="text-xl font-semibold mb-2">Transport Services</h2>
+        <p className="text-gray-300">Reliable rides and deliveries like Uber, Mr D, and Takealot.</p>
+      </CardContent>
+    </Card>
+
+    <Card className="bg-gray-800">
+      <CardContent className="p-6">
+        <Scissors className="text-pink-400 w-10 h-10 mb-4" />
+        <h2 className="text-xl font-semibold mb-2">Barber & Beauty</h2>
+        <p className="text-gray-300">Mobile grooming services brought straight to your door.</p>
+      </CardContent>
+    </Card>
+
+    <Card className="bg-gray-800">
+      <CardContent className="p-6">
+        <ShoppingCart className="text-green-400 w-10 h-10 mb-4" />
+        <h2 className="text-xl font-semibold mb-2">Custom Printing</h2>
+        <p className="text-gray-300">T-shirts and mugs printed with your unique designs.</p>
+      </CardContent>
+    </Card>
+  </section>
+
+  <section className="text-center mt-12">
+    <h2 className="text-2xl font-semibold mb-4">Book a Service</h2>
+    <div className="max-w-md mx-auto grid gap-4">
+      <input
+        type="text"
+        placeholder="Your Name"
+        value={booking.name}
+        onChange={(e) => setBooking({ ...booking, name: e.target.value })}
+        className="p-2 rounded bg-gray-700 text-white"
+      />
+      <input
+        type="text"
+        placeholder="Service (e.g. Transport, Barber)"
+        value={booking.service}
+        onChange={(e) => setBooking({ ...booking, service: e.target.value })}
+        className="p-2 rounded bg-gray-700 text-white"
+      />
+      <input
+        type="text"
+        placeholder="Phone Number"
+        value={booking.phone}
+        onChange={(e) => setBooking({ ...booking, phone: e.target.value })}
+        className="p-2 rounded bg-gray-700 text-white"
+      />
+      <input
+        type="date"
+        value={booking.date}
+        onChange={(e) => setBooking({ ...booking, date: e.target.value })}
+        className="p-2 rounded bg-gray-700 text-white"
+      />
+      <Button onClick={handleBookingSubmit} className="bg-green-600 hover:bg-green-700">Book Now</Button>
+      {message && <p className="text-sm text-yellow-400 mt-2">{message}</p>}
+    </div>
+  </section>
+
+  <section className="text-center mt-12">
+    <h2 className="text-2xl font-semibold mb-4">Pay via EFT</h2>
+    <div className="bg-gray-800 p-4 rounded-lg inline-block text-left">
+      <p><strong>Account Name:</strong> Naazhim Ismael t/a 2190 Trading</p>
+      <p><strong>Bank:</strong> TymeBank</p>
+      <p><strong>Account Number:</strong> 53001912820</p>
+      <p><strong>Branch Code:</strong> 678910</p>
+      <p><strong>Account Type:</strong> Current Account</p>
+      <p className="text-sm text-yellow-400 mt-2">*Use your name or order number as payment reference.</p>
+    </div>
+  </section>
+
+  <section className="text-center mt-12">
+    <h2 className="text-2xl font-semibold mb-4">Upload Proof of Payment</h2>
+    <div className="max-w-md mx-auto grid gap-4">
+      <input
+        type="file"
+        onChange={(e) => setFile(e.target.files[0])}
+        className="p-2 bg-gray-700 text-white rounded"
+      />
+      <Button onClick={handleFileUpload} className="bg-purple-600 hover:bg-purple-700 flex items-center gap-2">
+        <UploadCloud className="w-4 h-4" /> Upload File
+      </Button>
+    </div>
+  </section>
+
+  <section className="text-center mt-12">
+    <h2 className="text-2xl font-semibold mb-4">Contact Us</h2>
+    <div className="flex justify-center items-center gap-4 text-gray-300 mb-6">
+      <Phone /> <span>078 790 1675</span>
+      <Mail /> <span>Naazhimismael@gmail.com</span>
+    </div>
+    <Button onClick={handlePayment} className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-2xl shadow-md">
+      Pay Online with Luno
+    </Button>
+  </section>
+
+  <footer className="text-center text-gray-500 mt-10 border-t border-gray-700 pt-4">
+    &copy; 2025 2190 Trading. Powered by Joburg Energy.
+  </footer>
+</main>
+
+); }
+
